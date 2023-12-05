@@ -38,7 +38,7 @@ export function Axios() {
             avatar: "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffa.nody.ir%2F%25D8%25B9%25DA%25A9%25D8%25B3-%25D8%25AF%25D8%25AE%25D8%25AA%25D8%25B1%25D8%25A7%25D9%2586%25D9%2587-%25D8%25A8%25D8%25B1%25D8%25A7%25DB%258C-%25D9%25BE%25D8%25B1%25D9%2588%25D9%2581%25D8%25A7%25DB%258C%25D9%2584%2F&psig=AOvVaw2GydAITdWXTPcaJowrXzIU&ust=1701806689169000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCLDX_5LK9oIDFQAAAAAdAAAAABAG"
         }
         try {
-            const post = await axios.post("https://reqres.in/api/users", newUser);
+            const post = await axios.post("https://reqres.in/api/users", data);
             console.log(post);
             setClties({[...cities,data]})
         } catch (erorr) {
