@@ -121,6 +121,9 @@ export function Axios() {
         getlist();
     }, []);
 
+    function amir (item:Citvitrm){
+       return search.toLowerCase() === '' ? item : item.first_name.toLowerCase().includes(search)
+    }
 
     return (
         <div>
@@ -134,7 +137,7 @@ export function Axios() {
             {
 
                 cities.filter((item) => {
-                    return search.toLowerCase() === '' ? item : item.first_name.toLowerCase().includes(search)
+                    return amir(item)
                 }).map((row) => {
                     return (
                         <div key={row.id}>
