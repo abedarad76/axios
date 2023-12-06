@@ -4,6 +4,8 @@ import { Lodings } from "./loding"
 
 
 export function Axios() {
+
+
     type Citvitrm = {
         id: number,
         email?: string,
@@ -11,16 +13,15 @@ export function Axios() {
         last_name: string,
         avatar?: string,
     }
-    
-    const [search, setsearch] = useState<string>("");
+
 
     const [Loding, setLoding] = useState<boolean>(true);
 
+    const [search, setsearch] = useState<string>("");
     const [cities, setClties] = useState<Citvitrm[]>([]);
 
-    const [datas, setDatas] = useState<Citvitrm[]>([]);
     const baseUrl = "https://reqres.in/api/users";
-const [inputs,setInputs] = useState<Citvitrm>({} as Citvitrm)
+    const [inputs, setInputs] = useState<Citvitrm>({} as Citvitrm)
 
     async function getlist() {
         try {
@@ -38,19 +39,19 @@ const [inputs,setInputs] = useState<Citvitrm>({} as Citvitrm)
 
     async function PostUpdate() {
 
-        const schema = {
-            first_name: "first_name.name",
-            last_name: "product.brand"
+        // const schema = {
+        //     first_name: "first_name.name",
+        //     last_name: "product.brand"
 
-        }
+        // }
+
         try {
-            const post = await axios.post<unknown, AxiosResponse< Citvitrm >>(baseUrl, inputs);
+            const post = await axios.post<unknown, AxiosResponse<Citvitrm>>(baseUrl, inputs);
             console.log(post.data);
-            // setDatas();
-            if(post.status === 201){
+            if (post.status === 201) {
                 let temp = post.data;
 
-                setClties([...cities,temp])
+                setClties([...cities, temp])
             }
 
         } catch (erorr) {
@@ -61,56 +62,78 @@ const [inputs,setInputs] = useState<Citvitrm>({} as Citvitrm)
 
 
     async function putUpdate(ids: number) {
-        let tempUser = cities.filter(item=>item.id === ids)[0];
-            tempUser = {...tempUser,...inputs}
-        const response = await axios.patch<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`,tempUser);
-        if(response.status === 200){
-            let tempUser = cities.filter(item=>item.id === ids)[0];
-            tempUser = {...tempUser,...response.data}
-            let temp = cities.filter(item=>item.id !== ids);
-            temp.push(tempUser)
-           setClties(()=>[...temp])
+
+        try {
+
+            let tempUser = cities.filter(item => item.id === ids)[0];
+            tempUser = { ...tempUser, ...inputs }
+            const response = await axios.patch<unknown, AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`, tempUser);
+            if (response.status === 200) {
+                let tempUser = cities.filter(item => item.id === ids)[0];
+                tempUser = { ...tempUser, ...response.data }
+                let temp = cities.filter(item => item.id !== ids);
+                temp.push(tempUser)
+                setClties(() => [...temp])
+            }
+            console.log(response)
+
+        } catch (erorr) {
+            console.log("Api posts ", erorr)
         }
-        console.log(response)
 
     };
 
     async function patchUpdate(ids: number) {
-        const response = await axios.patch<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`,inputs);
-        if(response.status === 200){
-            let tempUser = cities.filter(item=>item.id === ids)[0];
-            tempUser = {...tempUser,...response.data}
-            let temp = cities.filter(item=>item.id !== ids);
-            temp.push(tempUser)
-           setClties(()=>[...temp])
+
+        try {
+
+            const response = await axios.patch<unknown, AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`, inputs);
+            if (response.status === 200) {
+                let tempUser = cities.filter(item => item.id === ids)[0];
+                tempUser = { ...tempUser, ...response.data }
+                let temp = cities.filter(item => item.id !== ids);
+                temp.push(tempUser)
+                setClties(() => [...temp])
+            }
+            console.log(response);
+
+        } catch (erorr) {
+            console.log("Api posts ", erorr)
         }
-        console.log(response)
+
 
     };
 
     async function handleDelete(ids: number) {
-        const response = await axios.delete<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`);
-        if(response.status === 204){
-            let temp = cities.filter(item=>item.id !== ids);
-           setClties(()=>[...temp])
+        try {
+            const response = await axios.delete<unknown, AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`);
+            if (response.status === 204) {
+                let temp = cities.filter(item => item.id !== ids);
+                setClties(() => [...temp])
+            }
+
+        } catch (erorr) {
+            console.log("Api posts ", erorr)
         }
     };
 
     useEffect(() => {
         getlist();
-    }, [])
+    }, []);
+
+
     return (
         <div>
-            <button onClick={getlist}>onklok</button>
             <button onClick={() => PostUpdate()}>postUpdate</button>
-            <input type="text" placeholder='seh....' onChange={(e)=>setsearch(e.target.value)} />
-            <input type="text" placeholder='name' onChange={(e)=>setInputs((pre)=>{return {...pre,first_name:e.target.value}})} />
-            <input type="text" placeholder='lastname' onChange={(e)=>setInputs((pre)=>{return {...pre,last_name:e.target.value}})} />
-            <input type="text" placeholder='email' onChange={(e)=>setInputs((pre)=>{return {...pre,email:e.target.value}})} />
+            <input type="text" placeholder='seh....' onChange={(e) => setsearch(e.target.value)} />
+
+            <input type="text" placeholder='name' onChange={(e) => setInputs((props) => { return { ...props, first_name: e.target.value } })} />
+            <input type="text" placeholder='lastname' onChange={(e) => setInputs((props) => { return { ...props, last_name: e.target.value } })} />
+            <input type="text" placeholder='email' onChange={(e) => setInputs((props) => { return { ...props, email: e.target.value } })} />
 
             {
-               
-                cities.filter((item)=>{
+
+                cities.filter((item) => {
                     return search.toLowerCase() === '' ? item : item.first_name.toLowerCase().includes(search)
                 }).map((row) => {
                     return (
