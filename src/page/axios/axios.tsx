@@ -6,10 +6,10 @@ import { Lodings } from "./loding"
 export function Axios() {
     type Citvitrm = {
         id: number,
-        email: string,
+        email?: string,
         first_name: string,
         last_name: string,
-        avatar: string,
+        avatar?: string,
     }
     
     const [search, setsearch] = useState<string>("");
@@ -19,11 +19,12 @@ export function Axios() {
     const [cities, setClties] = useState<Citvitrm[]>([]);
 
     const [datas, setDatas] = useState<Citvitrm[]>([]);
-
+    const baseUrl = "https://reqres.in/api/users";
+const [inputs,setInputs] = useState<Citvitrm>({} as Citvitrm)
 
     async function getlist() {
         try {
-            const List = await axios.get<unknown, AxiosResponse<{ data: Citvitrm[] }>>("https://reqres.in/api/users?page=2");
+            const List = await axios.get<unknown, AxiosResponse<{ data: Citvitrm[] }>>(`${baseUrl}?page=2`);
             console.log(List);
             // setTimeout(()=>{
             //      setClties(List.data.data);
@@ -43,10 +44,14 @@ export function Axios() {
 
         }
         try {
-            const post = await axios.post<unknown, AxiosResponse<{ data: Citvitrm[] }>>("https://reqres.in/api/users", schema);
-            console.log(post);
+            const post = await axios.post<unknown, AxiosResponse< Citvitrm >>(baseUrl, inputs);
+            console.log(post.data);
             // setDatas();
-          
+            if(post.status === 201){
+                let temp = post.data;
+
+                setClties([...cities,temp])
+            }
 
         } catch (erorr) {
             console.log("Api posts ", erorr)
@@ -55,15 +60,40 @@ export function Axios() {
     }
 
 
-
-
     async function putUpdate(ids: number) {
-        console.log("getUpdate", ids);
+        let tempUser = cities.filter(item=>item.id === ids)[0];
+            tempUser = {...tempUser,...inputs}
+        const response = await axios.patch<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`,tempUser);
+        if(response.status === 200){
+            let tempUser = cities.filter(item=>item.id === ids)[0];
+            tempUser = {...tempUser,...response.data}
+            let temp = cities.filter(item=>item.id !== ids);
+            temp.push(tempUser)
+           setClties(()=>[...temp])
+        }
+        console.log(response)
+
+    };
+
+    async function patchUpdate(ids: number) {
+        const response = await axios.patch<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`,inputs);
+        if(response.status === 200){
+            let tempUser = cities.filter(item=>item.id === ids)[0];
+            tempUser = {...tempUser,...response.data}
+            let temp = cities.filter(item=>item.id !== ids);
+            temp.push(tempUser)
+           setClties(()=>[...temp])
+        }
+        console.log(response)
 
     };
 
     async function handleDelete(ids: number) {
-
+        const response = await axios.delete<unknown,AxiosResponse<Citvitrm>>(`${baseUrl}/${ids}`);
+        if(response.status === 204){
+            let temp = cities.filter(item=>item.id !== ids);
+           setClties(()=>[...temp])
+        }
     };
 
     useEffect(() => {
@@ -74,6 +104,9 @@ export function Axios() {
             <button onClick={getlist}>onklok</button>
             <button onClick={() => PostUpdate()}>postUpdate</button>
             <input type="text" placeholder='seh....' onChange={(e)=>setsearch(e.target.value)} />
+            <input type="text" placeholder='name' onChange={(e)=>setInputs((pre)=>{return {...pre,first_name:e.target.value}})} />
+            <input type="text" placeholder='lastname' onChange={(e)=>setInputs((pre)=>{return {...pre,last_name:e.target.value}})} />
+            <input type="text" placeholder='email' onChange={(e)=>setInputs((pre)=>{return {...pre,email:e.target.value}})} />
 
             {
                
@@ -86,8 +119,6 @@ export function Axios() {
                             <h1>{row.last_name}/name|</h1>
                             <b>{row.first_name}</b>
                             <h2>email | {row.email}</h2>
-
-
                             <button onClick={() => putUpdate(row.id)}>Update</button>
                             <button onClick={() => handleDelete(row.id)}>delete</button>
                         </div>
