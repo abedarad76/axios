@@ -6,9 +6,9 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/create" element={<CreateStudent/>} />
+      <Route path="/create" element={<CreateStudent />} />
       <Route path="*" element={<h1>page not found</h1>} />
-      <Route path="/axios" element={<Axios/>}/>
+      <Route path="/axios" element={<Axios />} />
     </Routes>
   )
 }

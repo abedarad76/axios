@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Lodings } from "./loding"
 
 
+
 export function Axios() {
 
 
@@ -31,7 +32,6 @@ export function Axios() {
             //      setClties(List.data.data);
             // },3000)
             setClties(List.data.data);
-            setLoding(false);
         } catch (erorr) {
             console.log("API GET", erorr)
         }
@@ -46,7 +46,14 @@ export function Axios() {
         // }
 
         try {
-            const post = await axios.post<unknown, AxiosResponse<Citvitrm>>(baseUrl, inputs);
+            const GetToken = await localStorage.getItem("token");
+            const post = await axios.post<unknown, AxiosResponse<Citvitrm>>(baseUrl, {
+                inputs, GetToken
+                // headers: {
+                //     "Content-Type": "application/json",
+                //     Authorization: "Bearer " + GetToken,
+                //   },
+            });
             console.log(post.data);
             if (post.status === 201) {
                 let temp = post.data;
@@ -118,11 +125,14 @@ export function Axios() {
     };
 
     useEffect(() => {
-        getlist();
-    }, []);
+        setTimeout(() => {
+            getlist(),
+                setLoding(false)
+        }, 3000)
+    }, [cities]);
 
-    function searchBox (item:Citvitrm){
-       return search.toLowerCase() === '' ? item : item.first_name.toLowerCase().includes(search)
+    function searchBox(item: Citvitrm, search: string) {
+        return search.toLowerCase() === '' ? item : item.first_name && item.last_name.toLowerCase().includes(search);
     }
 
     return (
@@ -135,21 +145,22 @@ export function Axios() {
             <input type="text" placeholder='email' onChange={(e) => setInputs((props) => { return { ...props, email: e.target.value } })} />
 
             {
+                Loding ? <Lodings /> :
 
-                cities.filter((item) => {
-                    return searchBox(item)
-                }).map((row) => {
-                    return (
-                        <div key={row.id}>
-                            <img src={row.avatar} alt="" />
-                            <h1>{row.last_name}/name|</h1>
-                            <b>{row.first_name}</b>
-                            <h2>email | {row.email}</h2>
-                            <button onClick={() => putUpdate(row.id)}>Update</button>
-                            <button onClick={() => handleDelete(row.id)}>delete</button>
-                        </div>
-                    )
-                })
+                    cities.filter((item) => {
+                        return searchBox(item, search)
+                    }).map((row) => {
+                        return (
+                            <div key={row.id}>
+                                <img src={row.avatar} alt="" />
+                                <h1>{row.last_name}/name|</h1>
+                                <b>{row.first_name}</b>
+                                <h2>email | {row.email}</h2>
+                                <button onClick={() => putUpdate(row.id)}>Update</button>
+                                <button onClick={() => handleDelete(row.id)}>delete</button>
+                            </div>
+                        )
+                    })
             }
 
         </div>)
